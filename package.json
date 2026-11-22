@@ -1,0 +1,43 @@
+{
+  "name": "@notyza/sdk",
+  "version": "0.1.0",
+  "description": "Cliente oficial da API do Notyza para Node.js: NFS-e, NF-e, NFC-e e MDF-e, webhooks assinados.",
+  "license": "MIT",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "prepare": "tsc -p tsconfig.build.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.2.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/notyza/notyza-node.git"
+  },
+  "homepage": "https://notyza.com.br/docs",
+  "bugs": {
+    "url": "https://github.com/notyza/notyza-node/issues"
+  },
+  "keywords": [
+    "nfse",
+    "nfe",
+    "nfce",
+    "mdfe",
+    "nota fiscal",
+    "notyza",
+    "api"
+  ]
+}
