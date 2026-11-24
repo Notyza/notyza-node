@@ -103,7 +103,7 @@ export class Notyza {
     /** The same `id` never issues twice: asking again answers with the nota already there. */
     issue: (nota: Json): Promise<DocumentResult> => this.request('POST', '/v1/notas', nota, [422]) as Promise<DocumentResult>,
     get: (id: string, options: { issuer?: string; xml?: boolean } = {}) => this.request('GET', `/v1/notas/${Notyza.id(id)}${Notyza.query({ issuer: options.issuer, xml: options.xml ? 1 : undefined })}`),
-    list: (filter: { issuer?: string; status?: string; model?: 'nfse' | 'nfe' | 'nfce' | 'mdfe'; q?: string; from?: string; to?: string; limit?: number; before?: string } = {}) =>
+    list: (filter: { issuer?: string; status?: string; model?: 'nfse' | 'nfe' | 'nfce' | 'mdfe' | 'cte'; q?: string; from?: string; to?: string; limit?: number; before?: string } = {}) =>
       this.request<{ notas: Json[]; total: number }>('GET', `/v1/notas${Notyza.query(filter)}`),
     cancel: (id: string, body: { issuer?: string; reasonCode?: '1' | '2' | '9'; reason?: string } = {}) => this.request('POST', `/v1/notas/${Notyza.id(id)}/cancel`, body, [422]) as Promise<DocumentResult>,
     substitute: (id: string, body: Json) => this.request('POST', `/v1/notas/${Notyza.id(id)}/substitute`, body, [422]) as Promise<DocumentResult>,
@@ -111,7 +111,7 @@ export class Notyza {
     /** Many at once: up to 500 notas as a .zip (pdf, xml, both) or a spreadsheet (csv). */
     export: (body: Json) => this.request('POST', '/v1/notas/export', body),
     /** Why the government refused (a nota of the account, or a code): the cause, the fix and the field. */
-    diagnose: (body: { nota?: string; issuer?: string; code?: string; message?: string; model?: 'nfse' | 'nfe' | 'nfce' | 'mdfe' }) => this.request('POST', '/v1/diagnose', body),
+    diagnose: (body: { nota?: string; issuer?: string; code?: string; message?: string; model?: 'nfse' | 'nfe' | 'nfce' | 'mdfe' | 'cte' }) => this.request('POST', '/v1/diagnose', body),
   }
 
   /** NF-e (modelo 55). */
@@ -136,6 +136,23 @@ export class Notyza {
   }
 
   /** MDF-e (modelo 58, the trip's manifest of the own cargo). */
+  /** CT-e (modelo 57): the document of each road freight of a carrier in the Simples. */
+  readonly cte = {
+    issue: (cte: Json): Promise<DocumentResult> => this.request('POST', '/v1/cte', cte, [422]) as Promise<DocumentResult>,
+    get: (id: string, issuer?: string) => this.request('GET', `/v1/cte/${Notyza.id(id)}${Notyza.query({ issuer })}`),
+    /** A carta de correção: [{ group, field, value, item? }]; never values, parties or dates. */
+    correct: (id: string, corrections: Array<{ group: string; field: string; value: string; item?: number }>, issuer?: string) =>
+      this.request('POST', `/v1/cte/${Notyza.id(id)}/correction`, { corrections, ...(issuer ? { issuer } : {}) }),
+    cancel: (id: string, body: { issuer?: string; reason?: string } = {}) => this.request('POST', `/v1/cte/${Notyza.id(id)}/cancel`, body, [422]) as Promise<DocumentResult>,
+    /** The value that was missing of an authorized freight (the same parties). */
+    complement: (id: string, body: Json) => this.request('POST', `/v1/cte/${Notyza.id(id)}/complement`, body, [422]) as Promise<DocumentResult>,
+    /** The same freight with what was wrong fixed; SEFAZ accepts it after the tomador's disagreement. */
+    substitute: (id: string, body: Json) => this.request('POST', `/v1/cte/${Notyza.id(id)}/substitute`, body, [422]) as Promise<DocumentResult>,
+    /** The tomador's side: the service of a CT-e it paid for was not as agreed. */
+    disagree: (body: { issuer?: string; key: string; reason: string }) => this.request('POST', '/v1/cte/disagreement', body),
+    pdf: (id: string, issuer?: string) => this.pdf(`/v1/cte/${Notyza.id(id)}/pdf${Notyza.query({ issuer })}`),
+  }
+
   readonly mdfe = {
     issue: (mdfe: Json): Promise<DocumentResult> => this.request('POST', '/v1/mdfe', mdfe, [422]) as Promise<DocumentResult>,
     get: (id: string, issuer?: string) => this.request('GET', `/v1/mdfe/${Notyza.id(id)}${Notyza.query({ issuer })}`),
