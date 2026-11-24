@@ -6,8 +6,10 @@ conferência dos webhooks assinados. TypeScript, sem dependências, Node 18+.
 ## Instalar
 
 ```bash
-npm install github:notyza/notyza-node
+npm install @notyza/sdk
 ```
+
+[![npm](https://img.shields.io/npm/v/@notyza/sdk)](https://www.npmjs.com/package/@notyza/sdk)
 
 ## Emitir
 
